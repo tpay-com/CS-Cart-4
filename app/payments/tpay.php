@@ -1,12 +1,9 @@
 <?php
 
+include_once 'tpayLibs/examples/loader.php';
+
 use Tygh\Registry;
 
-include_once 'tpay/_class_tpay/exception.php';
-include_once 'tpay/_class_tpay/lang.php';
-include_once 'tpay/_class_tpay/paymentBasic.php';
-include_once 'tpay/_class_tpay/util.php';
-include_once 'tpay/_class_tpay/validate.php';
 if (!defined('BOOTSTRAP')) {
     die('Access denied');
 }
@@ -19,7 +16,8 @@ if ($mode == "place_order") {
     $orderId = $order_info['order_id'];
     $orderData = fn_get_order_info($orderId);
     $confData = $orderData['payment_method']['processor_params'];
-    $tpay = new tpay\PaymentBasic((int)$confData['seller_id'], $confData['key']);
+
+    $tpay = new tpayLibs\examples\BankSelection($confData['key'], $confData['seller_id']);
 
     $current_location = Registry::get('config.http_location');
     $return = fn_url("payment_notification.result&payment=tpay");
@@ -40,13 +38,13 @@ if ($mode == "place_order") {
     $data['pow_url'] = $return_url . "&success=true&order=" . $orderId;
     $data['pow_url_blad'] = $return_url . "&success=false&order=" . $orderId;
     $data['wyn_url'] = $return . "&validate=true";
-    if (isset($_REQUEST['payment_info']['kanal'])) {
-    $data['kanal'] = (int)$_REQUEST['payment_info']['kanal'];
+    if (isset($_REQUEST['payment_info']['group'])) {
+        $data['grupa'] = (int)$_REQUEST['payment_info']['group'];
     }
-    if (isset($_REQUEST['payment_info']['regulamin'])) {
-    $data['akceptuje_regulamin'] = $_REQUEST['payment_info']['regulamin'] === 'on' ? 1 : 0;
+    if (isset($_REQUEST['payment_info']['regulamin']) && $_REQUEST['payment_info']['regulamin'] === 'on') {
+        $data['akceptuje_regulamin'] = 1;
     }
-    $form = $tpay->getTransactionForm($data);
+    $form = $tpay->getTransactionForm($data, true);
     fn_change_order_status($orderId, "O");
     echo $form;
     echo '
@@ -71,7 +69,7 @@ if ($mode == "place_order") {
                 $orderId = base64_decode($_POST['tr_crc']);
                 $orderData = fn_get_order_info($orderId);
                 $confData = $orderData['payment_method']['processor_params'];
-                $tpay = new tpay\PaymentBasic((int)$confData['seller_id'], $confData['key']);
+                $tpay = new tpayLibs\examples\TransactionNotification($confData['key'], (int)$confData['seller_id']);
                 $res = $tpay->checkPayment();
 
                 if ((double)$orderData['total'] === (double)$res['tr_amount']) {

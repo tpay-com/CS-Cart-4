@@ -425,8 +425,8 @@
         <div class="insidebg" id="main-payment">
             <img src="https://tpay.com/img/logo/tpaycom.png" height="145" width="250"/><br/>
             <input type="button" value="Odśwież listę" onclick="showchannels()"/>
-            <div id="kanaly_v">
-                <input type="hidden" id="tpay-channel-input" name="payment_info[kanal]">
+            <div id="groups_v">
+                <input type="hidden" id="tpay-channel-input" name="payment_info[group]">
                 <div class="separator"><span><p class="font"><br/>Karty płatnicze i przelewy</p></span></div>
                 <center>
                     <div id="bank-selection-form"></div>
@@ -449,15 +449,15 @@
 
                         bank_selection_form = document.getElementById('bank-selection-form'),
                         bank_selection_form2 = document.getElementById('bank-selection-form2');
-                s.src = 'https://secure.tpay.com/channels-{/literal}{$payment_info.processor_params['seller_id']}{literal}1.js';
+                s.src = 'https://secure.tpay.com/groups-{/literal}{$payment_info.processor_params['seller_id']}{literal}0.js?3';
                 s.onload = function () {
                     var str = '', first = true, i, str2 = '', temp;
-                    var others = [29, 31, 49, 50, 57, 58, 59];
+                    var others = [157, 106, 109, 148, 104];
 
-                    for (i in tr_channels) {
-                        var channel = tr_channels[i],
-                                id = channel[0],
-                                width_style = (channel[0] == 40) ? 'width:270px' : '',
+                    for (i in tr_groups) {
+                        var group = tr_groups[i],
+                                id = group[0],
+                                width_style = (group[0] == 103) ? 'width:273px' : '',
                                 checked, class_name;
 
                         if (first) {
@@ -470,7 +470,7 @@
                             class_name = ''
                         }
                         temp = '<div class="bank-block' + class_name + '" id="bank-' + id +
-                                '" style="background-image:url(' + channel[3] + ');' + width_style +
+                                '" style="background-image:url(' + group[3] + ');' + width_style +
                                 '"><label onclick="changeBank(' + id + ')"><input type="radio" name="bank-select" value="' +
                                 id + '" ' + checked + ' style="visibility: hidden" /></label></div>';
 
