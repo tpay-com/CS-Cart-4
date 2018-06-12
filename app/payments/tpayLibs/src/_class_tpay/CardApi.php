@@ -38,7 +38,9 @@ class CardApi extends CardOptions
             CardDictionary::AMOUNT => $this->amount,
         ));
         $params[CardDictionary::CURRENCY] = $this->currency;
-        $params['order_id'] = $this->orderID;
+        if (!empty($this->orderID)) {
+            $params['order_id'] = $this->orderID;
+        }
         if ($this->oneTimer) {
             $params['onetimer'] = $this->oneTimer;
         }
@@ -49,6 +51,9 @@ class CardApi extends CardOptions
         $params[CardDictionary::SIGN] = hash($this->cardHashAlg, implode('', $params) . $this->cardVerificationCode);
         $params[CardDictionary::APIPASS] = $this->cardApiPass;
         $params = array_merge($params, $this->checkReturnUrls());
+        if (!is_null($this->moduleName)) {
+            $params['module'] = $this->moduleName;
+        }
         $this->validateConfig(new PaymentTypeCard(), $params);
         Util::log('Card request', print_r($params, true));
 
@@ -88,9 +93,11 @@ class CardApi extends CardOptions
             CardDictionary::CLIAUTH  => $this->clientAuthCode,
             CardDictionary::DESC     => $saleDescription,
             CardDictionary::CURRENCY => $this->currency,
-            CardDictionary::ORDERID  => $this->orderID,
             CardDictionary::LANGUAGE => $this->lang,
         );
+        if (!empty($this->orderID)) {
+            $params[CardDictionary::ORDERID] = $this->orderID;
+        }
         $params[CardDictionary::SIGN] = hash($this->cardHashAlg, CardDictionary::PRESALE . $this->clientAuthCode .
             $saleDescription . $this->amount . $this->currency . $this->orderID . $this->lang .
             $this->cardVerificationCode);
